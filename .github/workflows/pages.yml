@@ -36,6 +36,42 @@ jobs:
       - name: Build production site
         run: npm run build
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+
+      - name: Restore Android debug keystore
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: rakshacall-android-debug-keystore-v1
+
+      - name: Sync Capacitor Android project
+        run: npx cap sync android
+
+      - name: Build preview APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Add APK to the site
+        run: |
+          mkdir -p dist/downloads
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/downloads/RakshaCall.apk
+          SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          APKSIGNER=$(find "$SDK_ROOT/build-tools" -name apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --verbose dist/downloads/RakshaCall.apk
+          ls -lh dist/downloads/RakshaCall.apk
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 

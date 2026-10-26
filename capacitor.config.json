@@ -1,0 +1,11 @@
+{
+  "appId": "com.rakshacall.app",
+  "appName": "RakshaCall",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

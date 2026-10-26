@@ -33,7 +33,7 @@ does the voice match the person who enrolled, and does the conversation follow a
 | **Family Circle** | Records a 10-second enrolment per relative, checks sample quality, stores a voiceprint (numbers only, never audio), plus a family safe word and a private question. Lets you test a voice against the profile. |
 | **Test Lab** | Upload a call recording (WAV/MP3/M4A/OGG/WebM) and compare it with an enrolled voice; paste any transcript and see which scam patterns it matches. |
 | **Settings** | Sensitivity, speech-to-text language, sound alerts, local data export/import/delete, and a plain-language explanation of the algorithm and its limitations. |
-| **Get APK / Install** | Install RakshaCall on a phone as a home-screen app, with a prepared Android APK download slot for a signed build. |
+| **Get APK / Install** | Install RakshaCall as a home-screen PWA, or download the Android preview APK built by the Pages workflow. |
 
 Verdicts are three-state on purpose: **matches**, **not sure**, **does not match** — because pretending certainty is
 dangerous in a safety product.
@@ -73,11 +73,12 @@ Open **Get APK** in the app for the install screen.
 
 1. **Browser install (works today):** on Android use the browser menu → *Install app*; on iPhone use Safari → Share →
    *Add to Home Screen*. The app then opens full-screen and keeps working offline.
-2. **Android APK:** put a signed package at `public/downloads/RakshaCall.apk`. The Get APK screen checks for that file
-   and turns into a direct download automatically; until then it offers the browser install instead.
+2. **Android APK:** the Pages workflow wraps the production build in Capacitor and publishes a debug-signed preview
+   APK at `/downloads/RakshaCall.apk`. The Get APK screen turns into a direct download as soon as that file is present.
 
-The web app ships a manifest and service worker, so Chrome treats it as installable. Building a real Android package
-requires Android Studio (or the Android SDK and Java); those tools are not needed to run or demo this project.
+The web app ships a manifest and service worker, so Chrome treats it as installable. The published APK is a preview
+build for direct sideloading; a Play Store release still needs a private signing key and a release build. The workflow
+caches the debug keystore so successive preview builds keep the same signing identity.
 
 ---
 
@@ -187,7 +188,7 @@ fraud_detector/
 │   ├── manifest.webmanifest    # installable web app metadata
 │   ├── sw.js                   # offline shell cache
 │   ├── icons/                  # home-screen and maskable icons
-│   └── downloads/              # place RakshaCall.apk here for direct download
+│   └── downloads/              # preview APK is generated during Pages deployment
 ├── scripts/
 │   └── test-dsp.mjs           # Node sanity suite for the whole pipeline
 └── src/
@@ -307,7 +308,7 @@ status.
   keeping the same UI and the explainable fallback.
 - Add a Hindi/regional-language UI and native-speaker phrase banks.
 - Add a companion mode: the relative receives a push/SMS "was this you?" challenge with a one-time code.
-- Add an Android wrapper (Capacitor) with call-audio capture instead of speakerphone.
+- Add native call-audio capture to the Capacitor wrapper instead of speakerphone.
 - Calibrate on a small consented dataset and report EER / FAR / FRR.
 - Add a "family guardian" role with signed, encrypted profile sharing.
 

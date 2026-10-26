@@ -1,9 +1,23 @@
-Place the signed Android package in this folder as:
+The Android preview APK is built by the GitHub Pages workflow and copied to:
 
-  RakshaCall.apk
+  dist/downloads/RakshaCall.apk
 
-The "Get APK" screen checks for that exact filename. When the file is
-present, the download button becomes active automatically. When it is
-missing, the screen falls back to installing the web app on the phone.
+That file is generated during deployment and is not committed here.
 
-Do not commit a signing key or a personal debug APK to a public repository.
+The workflow wraps the production web build in Capacitor, builds a
+debug-signed APK, verifies its signature, and publishes it with the site.
+When the APK is present, the "Get APK" screen automatically shows the
+download button.
+
+For local builds, install the Android SDK and JDK 17, then run:
+
+  npm run build
+  npx cap sync android
+  cd android
+  gradlew assembleDebug
+
+The debug APK will be at:
+
+  android/app/build/outputs/apk/debug/app-debug.apk
+
+Do not commit a signing key or a personal release APK to this repository.

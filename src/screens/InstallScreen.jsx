@@ -3,13 +3,15 @@ import { Badge, Card, Stat } from '../components/ui.jsx';
 
 const APK_FILE = 'downloads/RakshaCall.apk';
 const APK_PATH = `${import.meta.env.BASE_URL}${APK_FILE}`;
+const isNativeShell =
+  Boolean(window.Capacitor?.isNativePlatform?.()) || /Capacitor/i.test(navigator.userAgent);
 
-const BUILD_COMMANDS = `npm install @capacitor/core @capacitor/cli @capacitor/android
+const BUILD_COMMANDS = `npm install
 npm run build
-npx cap init RakshaCall com.rakshacall.app --web-dir=dist
-npx cap add android
 npx cap sync android
-npx cap open android`;
+cd android
+gradlew assembleDebug`;
+
 
 function formatBytes(bytes) {
   if (!bytes || Number.isNaN(bytes)) return '';
@@ -20,9 +22,12 @@ function formatBytes(bytes) {
 export default function InstallScreen({ notify }) {
   const [installEvent, setInstallEvent] = useState(null);
   const [installed, setInstalled] = useState(
-    () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true
+    () =>
+      isNativeShell ||
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true
   );
-  const [apk, setApk] = useState({ state: 'checking' });
+  const [apk, setApk] = useState(isNativeShell ? { state: 'native' } : { state: 'checking' });
   const [hint, setHint] = useState('');
 
   useEffect(() => {
@@ -46,6 +51,7 @@ export default function InstallScreen({ notify }) {
   }, [notify]);
 
   useEffect(() => {
+    if (isNativeShell) return undefined;
     let cancelled = false;
     fetch(APK_PATH, { method: 'HEAD' })
       .then((response) => {
@@ -80,7 +86,7 @@ export default function InstallScreen({ notify }) {
 
   const copyCommands = () => {
     navigator.clipboard
-      ?.writeText(`${BUILD_COMMANDS}\n# Then copy the signed APK to public/${APK_FILE}`)
+      ?.writeText(`${BUILD_COMMANDS}\n# The GitHub Pages workflow publishes the preview APK automatically.`)
       ?.then(() => notify?.('Android build commands copied.'))
       .catch(() => notify?.('Could not copy. Select the commands and copy them manually.'));
   };
@@ -103,7 +109,7 @@ export default function InstallScreen({ notify }) {
         <Card
           className="apk-card"
           title="Android APK"
-          subtitle="A signed installation file for Android phones. Sideloading is normal for a family safety tool."
+          subtitle="An installable Android preview build. Sideloading is normal for a family safety tool."
           actions={<Badge tone="accent" big>Android</Badge>}
         >
           <div className="install-panel install-panel--apk">
@@ -120,14 +126,21 @@ export default function InstallScreen({ notify }) {
 
             {apk.state === 'checking' && <p className="note">Checking for a published APK build…</p>}
 
+            {apk.state === 'native' && (
+              <p className="notice">
+                You are already running the RakshaCall Android app. Keep it updated by installing a newer APK when
+                one is available.
+              </p>
+            )}
+
             {apk.state === 'ready' && (
               <>
                 <a className="btn btn--primary btn--lg" href={APK_PATH} download="RakshaCall.apk">
                   Download RakshaCall.apk
                 </a>
                 <p className="fineprint">
-                  Android may ask you to allow installs from this browser. That prompt is normal for apps installed
-                  outside the Play Store.
+                  Preview build, debug-signed for direct installation. Android may ask you to allow installs from
+                  this browser. That prompt is normal for apps installed outside the Play Store.
                 </p>
               </>
             )}
@@ -135,7 +148,7 @@ export default function InstallScreen({ notify }) {
             {apk.state === 'missing' && (
               <>
                 <p className="notice notice--warn">
-                  This copy does not contain the signed APK file yet. You can still install the same app on this phone
+                  This copy does not contain the preview APK file yet. You can still install the same app on this phone
                   right now — use the browser install panel on this page.
                 </p>
                 <div className="install-actions">
@@ -144,7 +157,7 @@ export default function InstallScreen({ notify }) {
                   </button>
                 </div>
                 <p className="fineprint">
-                  The APK slot is already wired into this page. Put a signed build at{' '}
+                  The APK slot is already wired into this page. Put a preview build at{' '}
                   <code>public/downloads/RakshaCall.apk</code> and this panel automatically becomes a direct download.
                 </p>
               </>
@@ -220,8 +233,8 @@ export default function InstallScreen({ notify }) {
       </div>
 
       <Card
-        title="For the project demo"
-        subtitle="How the APK is produced when you are ready to attach it to the build."
+        title="Build the APK"
+        subtitle="The Pages workflow builds and publishes a preview APK automatically."
       >
         <p className="prose">
           The interface in this repository is the web app itself. To turn it into an Android package, wrap the production
@@ -233,7 +246,7 @@ export default function InstallScreen({ notify }) {
             Copy commands
           </button>
           <span className="muted-sm">
-            Then copy the signed APK to public/{APK_FILE}
+            The workflow publishes the APK automatically
           </span>
         </div>
         <p className="fineprint">
