@@ -275,8 +275,16 @@ checks:
 Expected output ends with `ALL CHECKS PASSED`.
 
 For a browser-level check, `npm run build` must complete, then open each route (`#/guard`, `#/call`, `#/family`,
-`#/lab`, `#/install`, `#/settings`) and confirm there are no console errors. The layout is full-width: a fixed side
-rail on desktop becomes a compact top bar plus bottom tab bar on phones.
+`#/lab`, `#/install`, `#/settings`) and confirm there are no console errors. The layout is full-width: a sticky
+top navigation bar on desktop becomes a compact top bar plus bottom tab bar on phones.
+
+---
+
+## Deployment
+
+Every push to `main` builds and publishes the app through GitHub Actions Pages. A Vercel HTTPS mirror is also
+live. See [DEPLOYMENT.md](./DEPLOYMENT.md) for live URLs, the custom-domain DNS record, and the current HTTPS
+status.
 
 ---
 
