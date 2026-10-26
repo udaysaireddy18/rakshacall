@@ -78,7 +78,7 @@ Open **Get APK** in the app for the install screen.
 
 The web app ships a manifest and service worker, so Chrome treats it as installable. The published APK is a preview
 build for direct sideloading; a Play Store release still needs a private signing key and a release build. The workflow
-stores the preview debug keystore in the GitHub Actions cache so successive preview builds keep the same signing
+stores its preview-only signing key in the GitHub Actions cache so successive preview builds keep the same signing
 identity. If that cache is ever evicted, the next build creates a new key, and an already-installed preview must be
 uninstalled once before the new APK can be installed.
 

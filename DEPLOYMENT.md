@@ -65,7 +65,7 @@ vercel --prod --scope uday-695e
 ## APK download
 
 The Pages workflow wraps the production build in Capacitor, builds a
-debug-signed preview APK on the Android SDK, verifies it with `apksigner`, and
+preview-signed APK on the Android SDK, verifies it with `apksigner`, and
 publishes it as:
 
 ```
@@ -74,11 +74,11 @@ https://www.rakshacall.udaysaireddy.dev/downloads/RakshaCall.apk
 
 The Get APK screen checks for that file and shows a direct download when it is
 present. The APK itself is not committed to the repository. The workflow stores
-the preview debug keystore in the GitHub Actions cache as `.ci/debug.keystore`,
-keyed as `rakshacall-android-debug-keystore-v3`, so a new preview build can
-install over the previous one.
+its preview signing key in the GitHub Actions cache as `.ci/preview.keystore`,
+keyed as `rakshacall-preview-keystore-v1`, so a new preview build can install
+over the previous one.
 
-If GitHub evicts that cache, the next successful build generates a new debug
+If GitHub evicts that cache, the next successful build generates a new preview
 key. An already-installed preview then has to be uninstalled once before the
 replacement APK can be installed. The preview key is not a Play Store release
 key; use a private keystore and a release build before publishing to a store.

@@ -48,18 +48,34 @@ jobs:
         with:
           packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
 
-      - name: Restore Android debug keystore
-        id: android-debug-keystore
+      - name: Restore preview signing key
+        id: preview-key
         uses: actions/cache/restore@v4
         with:
-          path: .ci/debug.keystore
-          key: rakshacall-android-debug-keystore-v3
+          path: .ci/preview.keystore
+          key: rakshacall-preview-keystore-v1
 
-      - name: Install restored debug keystore
-        if: steps.android-debug-keystore.outputs.cache-hit == 'true'
+      - name: Create preview signing key if needed
+        if: steps.preview-key.outputs.cache-hit != 'true'
         run: |
-          mkdir -p /home/runner/.android
-          cp .ci/debug.keystore /home/runner/.android/debug.keystore
+          mkdir -p .ci
+          keytool -genkeypair \
+            -keystore .ci/preview.keystore \
+            -storetype PKCS12 \
+            -storepass rakshacall-preview \
+            -keypass rakshacall-preview \
+            -alias rakshacall-preview \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=RakshaCall Preview, OU=Preview, O=RakshaCall, L=Hyderabad, ST=Telangana, C=IN"
+
+      - name: Cache preview signing key
+        if: steps.preview-key.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .ci/preview.keystore
+          key: rakshacall-preview-keystore-v1
 
       - name: Sync Capacitor Android project
         run: npx cap sync android
@@ -69,20 +85,6 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
-
-      - name: Save Android debug keystore
-        if: steps.android-debug-keystore.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p .ci
-          cp /home/runner/.android/debug.keystore .ci/debug.keystore
-          test -s .ci/debug.keystore
-
-      - name: Cache Android debug keystore
-        if: steps.android-debug-keystore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: .ci/debug.keystore
-          key: rakshacall-android-debug-keystore-v3
 
       - name: Add APK to the site
         run: |

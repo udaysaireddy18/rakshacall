@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+// CI writes this preview-only signing key into the workspace and caches it.
+// Local builds fall back to the standard Android debug key when it is absent.
+def previewKeystore = rootProject.file('../.ci/preview.keystore')
+
 android {
     namespace "com.rakshacall.app"
     compileSdk rootProject.ext.compileSdkVersion
@@ -16,7 +20,22 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (previewKeystore.exists()) {
+            preview {
+                storeFile previewKeystore
+                storePassword 'rakshacall-preview'
+                keyAlias 'rakshacall-preview'
+                keyPassword 'rakshacall-preview'
+            }
+        }
+    }
     buildTypes {
+        debug {
+            if (previewKeystore.exists()) {
+                signingConfig signingConfigs.preview
+            }
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

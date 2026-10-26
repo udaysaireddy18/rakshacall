@@ -5,7 +5,7 @@ The Android preview APK is built by the GitHub Pages workflow and copied to:
 That file is generated during deployment and is not committed here.
 
 The workflow wraps the production web build in Capacitor, builds a
-debug-signed APK, verifies its signature, and publishes it with the site.
+preview-signed APK, verifies its signature, and publishes it with the site.
 When the APK is present, the "Get APK" screen automatically shows the
 download button. The CI preview key is kept in the GitHub Actions cache;
 local debug builds use their own debug key and will not update over a CI
