@@ -1,0 +1,24 @@
+{
+  "name": "rakshacall",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "RakshaCall — on-device voice impersonation & scam-call guard for families",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:dsp": "node scripts/test-dsp.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}

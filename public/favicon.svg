@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1e235c" />
+      <stop offset="1" stop-color="#050719" />
+    </linearGradient>
+    <linearGradient id="text" x1="18" y1="22" x2="48" y2="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#eeeaff" />
+      <stop offset="0.55" stop-color="#a78bfa" />
+      <stop offset="1" stop-color="#22d3ee" />
+    </linearGradient>
+    <radialGradient id="glow" cx="0.82" cy="0.1" r="0.8">
+      <stop offset="0" stop-color="#7c3aed" stop-opacity="0.55" />
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)" />
+  <rect width="64" height="64" rx="14" fill="url(#glow)" />
+  <rect x="4.5" y="4.5" width="55" height="55" rx="11" fill="none" stroke="#a78bfa" stroke-opacity="0.35" />
+  <text x="32" y="42" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="-1" fill="url(#text)">RC</text>
+</svg>
