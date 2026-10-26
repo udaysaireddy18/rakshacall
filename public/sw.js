@@ -1,7 +1,7 @@
-/* RakshaCall service worker — network first, cache fallback. */
+/* RakshaCall service worker - network first, cache fallback. */
 const BASE = new URL('.', self.location.href);
 const asset = (path) => new URL(path, BASE).href;
-const CACHE = 'rakshacall-shell-v4';
+const CACHE = 'rakshacall-shell-v5';
 const CORE = [
   BASE.href,
   asset('index.html'),
@@ -12,13 +12,42 @@ const CORE = [
   asset('icons/icon-maskable-512.png'),
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches
-      .open(CACHE)
-      .then((cache) => cache.addAll(CORE))
-      .then(() => self.skipWaiting())
+// Vite adds hashed JS/CSS names, so read the built index and cache whatever it
+// references. This makes the very first online visit enough for an offline
+// launch, instead of waiting for a second online page load.
+async function precacheAppShell() {
+  const cache = await caches.open(CACHE);
+  await cache.addAll(CORE);
+
+  const indexUrl = asset('index.html');
+  const response = await fetch(indexUrl, { cache: 'no-store' });
+  if (!response.ok) return;
+
+  await cache.put(indexUrl, response.clone());
+  const html = await response.text();
+  const assets = new Set();
+  const tags = /<(?:script|link)\b[^>]*(?:src|href)=["']([^"']+)["'][^>]*>/gi;
+
+  for (const match of html.matchAll(tags)) {
+    const value = match[1];
+    if (!value || value.startsWith('data:') || value.startsWith('#')) continue;
+    const resolved = new URL(value, indexUrl);
+    if (resolved.origin === self.location.origin) assets.add(resolved.href);
+  }
+
+  await Promise.all(
+    [...assets].map(async (url) => {
+      try {
+        await cache.add(url);
+      } catch {
+        /* Optional asset (for example an icon) - keep the core shell usable. */
+      }
+    })
   );
+}
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(precacheAppShell().then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {

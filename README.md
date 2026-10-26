@@ -85,6 +85,10 @@ uninstalled once before the new APK can be installed.
 Once RakshaCall is running as an installed app, the **Get APK** navigation link and the top-bar APK shortcut are hidden
 so an installed user is not asked to install the app again.
 
+**Offline:** after one online load, the service worker precaches the app shell and its hashed JS/CSS. The guard, family,
+lab, settings and saved data then work without a connection. Downloading the APK and optional live speech-to-text still
+need a network; manual transcript entry works fully offline.
+
 ---
 
 ## Demo script (3–4 minutes, good for a viva)
