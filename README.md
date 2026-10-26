@@ -80,6 +80,9 @@ The web app ships a manifest and service worker, so Chrome treats it as installa
 build for direct sideloading; a Play Store release still needs a private signing key and a release build. The workflow
 caches the debug keystore so successive preview builds keep the same signing identity.
 
+Once RakshaCall is running as an installed app, the **Get APK** navigation link and the top-bar APK shortcut are hidden
+so an installed user is not asked to install the app again.
+
 ---
 
 ## Demo script (3–4 minutes, good for a viva)

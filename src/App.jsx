@@ -5,6 +5,7 @@ import FamilyScreen from './screens/FamilyScreen.jsx';
 import LabScreen from './screens/LabScreen.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 import InstallScreen from './screens/InstallScreen.jsx';
+import { useInstalled } from './lib/install.js';
 import {
   DEFAULT_SETTINGS,
   clearEverything,
@@ -114,10 +115,12 @@ const NAV = [
 
 export default function App() {
   const [route, navigate] = useRoute();
+  const installed = useInstalled();
   const [profiles, setProfiles] = useState(loadProfiles);
   const [calls, setCalls] = useState(loadCalls);
   const [settings, setSettings] = useState(() => loadSettings() || DEFAULT_SETTINGS);
   const [toasts, setToasts] = useState([]);
+  const navItems = installed ? NAV.filter((item) => item.id !== 'install') : NAV;
 
   useEffect(() => { saveProfiles(profiles); }, [profiles]);
   useEffect(() => { saveCalls(calls); }, [calls]);
@@ -188,7 +191,7 @@ export default function App() {
         </a>
 
         <nav className="nav" aria-label="Main navigation">
-          {NAV.map(({ id, label, Icon }) => (
+          {navItems.map(({ id, label, Icon }) => (
             <a
               key={id}
               href={`#/${id}`}
@@ -209,19 +212,21 @@ export default function App() {
           <span className="header__badge" title="All processing happens on this device">
             <span className="dot" /> On-device
           </span>
-          <a
-            className="topbar__apk"
-            href="#/install"
-            onClick={(event) => {
-              event.preventDefault();
-              navigate('install');
-            }}
-            aria-label="Open the Android install page"
-            title="Get the Android APK"
-          >
-            <DownloadIcon />
-            <span>APK</span>
-          </a>
+          {!installed && (
+            <a
+              className="topbar__apk"
+              href="#/install"
+              onClick={(event) => {
+                event.preventDefault();
+                navigate('install');
+              }}
+              aria-label="Open the Android install page"
+              title="Get the Android APK"
+            >
+              <DownloadIcon />
+              <span>APK</span>
+            </a>
+          )}
         </div>
       </header>
 
@@ -271,7 +276,7 @@ export default function App() {
               notify={notify}
             />
           )}
-          {route === 'install' && <InstallScreen notify={notify} />}
+          {route === 'install' && <InstallScreen notify={notify} installed={installed} />}
         </main>
 
         <footer className="footer container">

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Badge, Card, Stat } from '../components/ui.jsx';
+import { isNativeShell } from '../lib/install.js';
 
 const APK_FILE = 'downloads/RakshaCall.apk';
 const APK_PATH = `${import.meta.env.BASE_URL}${APK_FILE}`;
-const isNativeShell =
-  Boolean(window.Capacitor?.isNativePlatform?.()) || /Capacitor/i.test(navigator.userAgent);
+const NATIVE_SHELL = isNativeShell();
 
 const BUILD_COMMANDS = `npm install
 npm run build
@@ -19,15 +19,9 @@ function formatBytes(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function InstallScreen({ notify }) {
+export default function InstallScreen({ notify, installed = false }) {
   const [installEvent, setInstallEvent] = useState(null);
-  const [installed, setInstalled] = useState(
-    () =>
-      isNativeShell ||
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true
-  );
-  const [apk, setApk] = useState(isNativeShell ? { state: 'native' } : { state: 'checking' });
+  const [apk, setApk] = useState(NATIVE_SHELL ? { state: 'native' } : { state: 'checking' });
   const [hint, setHint] = useState('');
 
   useEffect(() => {
@@ -36,7 +30,6 @@ export default function InstallScreen({ notify }) {
       setInstallEvent(event);
     };
     const onInstalled = () => {
-      setInstalled(true);
       setInstallEvent(null);
       setHint('');
       notify?.('RakshaCall is installed on this device.');
@@ -51,7 +44,7 @@ export default function InstallScreen({ notify }) {
   }, [notify]);
 
   useEffect(() => {
-    if (isNativeShell) return undefined;
+    if (NATIVE_SHELL) return undefined;
     let cancelled = false;
     fetch(APK_PATH, { method: 'HEAD' })
       .then((response) => {
