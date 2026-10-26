@@ -52,8 +52,14 @@ jobs:
         id: android-debug-keystore
         uses: actions/cache/restore@v4
         with:
-          path: /home/runner/.android/debug.keystore
-          key: rakshacall-android-debug-keystore-v2
+          path: .ci/debug.keystore
+          key: rakshacall-android-debug-keystore-v3
+
+      - name: Install restored debug keystore
+        if: steps.android-debug-keystore.outputs.cache-hit == 'true'
+        run: |
+          mkdir -p /home/runner/.android
+          cp .ci/debug.keystore /home/runner/.android/debug.keystore
 
       - name: Sync Capacitor Android project
         run: npx cap sync android
@@ -66,10 +72,17 @@ jobs:
 
       - name: Save Android debug keystore
         if: steps.android-debug-keystore.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p .ci
+          cp /home/runner/.android/debug.keystore .ci/debug.keystore
+          test -s .ci/debug.keystore
+
+      - name: Cache Android debug keystore
+        if: steps.android-debug-keystore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: /home/runner/.android/debug.keystore
-          key: rakshacall-android-debug-keystore-v2
+          path: .ci/debug.keystore
+          key: rakshacall-android-debug-keystore-v3
 
       - name: Add APK to the site
         run: |

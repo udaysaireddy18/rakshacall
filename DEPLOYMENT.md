@@ -74,9 +74,9 @@ https://www.rakshacall.udaysaireddy.dev/downloads/RakshaCall.apk
 
 The Get APK screen checks for that file and shows a direct download when it is
 present. The APK itself is not committed to the repository. The workflow stores
-the preview debug keystore at `/home/runner/.android/debug.keystore` in the
-GitHub Actions cache, keyed as `rakshacall-android-debug-keystore-v2`, so a new
-preview build can install over the previous one.
+the preview debug keystore in the GitHub Actions cache as `.ci/debug.keystore`,
+keyed as `rakshacall-android-debug-keystore-v3`, so a new preview build can
+install over the previous one.
 
 If GitHub evicts that cache, the next successful build generates a new debug
 key. An already-installed preview then has to be uninstalled once before the
