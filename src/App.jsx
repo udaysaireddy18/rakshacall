@@ -299,7 +299,7 @@ export default function App() {
         </main>
 
         <footer className="footer container">
-          <span>RakshaCall · local-first prototype · voice analysis stays on this device</span>
+          <span>RakshaCall · local-first prototype · voice analysis stays on this device · v2</span>
           <span className="footer__sep">·</span>
           <span>Report fraud: cybercrime.gov.in / 1930 (India)</span>
         </footer>
