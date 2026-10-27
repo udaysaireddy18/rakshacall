@@ -6,6 +6,7 @@ import LabScreen from './screens/LabScreen.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 import InstallScreen from './screens/InstallScreen.jsx';
 import HistoryScreen from './screens/HistoryScreen.jsx';
+import AutoSaveScreen from './screens/AutoSaveScreen.jsx';
 import { useInstalled } from './lib/install.js';
 import {
   DEFAULT_SETTINGS,
@@ -19,7 +20,7 @@ import {
   saveSettings,
 } from './lib/storage.js';
 
-const ROUTES = ['guard', 'call', 'family', 'history', 'lab', 'settings', 'install'];
+const ROUTES = ['guard', 'call', 'family', 'autosave', 'history', 'lab', 'settings', 'install'];
 
 function readRoute() {
   const hash = window.location.hash.replace(/^#\/?/, '').trim();
@@ -106,11 +107,19 @@ const ClockIcon = () => (
     <path d="M12 7v5l3 2" />
   </svg>
 );
+const SaveIcon = () => (
+  <svg {...iconProps}>
+    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+    <polyline points="17 21 17 13 7 13 7 21" />
+    <polyline points="7 3 7 8 15 8" />
+  </svg>
+);
 
 const NAV = [
   { id: 'guard', label: 'Guard', Icon: ShieldIcon },
   { id: 'call', label: 'Live call', Icon: PhoneIcon },
   { id: 'family', label: 'Family', Icon: UsersIcon },
+  { id: 'autosave', label: 'Auto Save', Icon: SaveIcon },
   { id: 'history', label: 'History', Icon: ClockIcon },
   { id: 'lab', label: 'Test lab', Icon: FlaskIcon },
   { id: 'install', label: 'Get APK', Icon: DownloadIcon },
@@ -270,6 +279,7 @@ export default function App() {
               notify={notify}
             />
           )}
+          {route === 'autosave' && <AutoSaveScreen settings={settings} onChange={changeSettings} onNavigate={navigate} />}
           {route === 'history' && <HistoryScreen calls={calls} profiles={profiles} onNavigate={navigate} />}
           {route === 'lab' && (
             <LabScreen profiles={profiles} settings={settings} notify={notify} onNavigate={navigate} />
