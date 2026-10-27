@@ -5,6 +5,7 @@ import FamilyScreen from './screens/FamilyScreen.jsx';
 import LabScreen from './screens/LabScreen.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 import InstallScreen from './screens/InstallScreen.jsx';
+import HistoryScreen from './screens/HistoryScreen.jsx';
 import { useInstalled } from './lib/install.js';
 import {
   DEFAULT_SETTINGS,
@@ -18,7 +19,7 @@ import {
   saveSettings,
 } from './lib/storage.js';
 
-const ROUTES = ['guard', 'call', 'family', 'lab', 'settings', 'install'];
+const ROUTES = ['guard', 'call', 'family', 'history', 'lab', 'settings', 'install'];
 
 function readRoute() {
   const hash = window.location.hash.replace(/^#\/?/, '').trim();
@@ -99,11 +100,18 @@ const GearIcon = () => (
     <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
   </svg>
 );
+const ClockIcon = () => (
+  <svg {...iconProps}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </svg>
+);
 
 const NAV = [
   { id: 'guard', label: 'Guard', Icon: ShieldIcon },
   { id: 'call', label: 'Live call', Icon: PhoneIcon },
   { id: 'family', label: 'Family', Icon: UsersIcon },
+  { id: 'history', label: 'History', Icon: ClockIcon },
   { id: 'lab', label: 'Test lab', Icon: FlaskIcon },
   { id: 'install', label: 'Get APK', Icon: DownloadIcon },
   { id: 'settings', label: 'Settings', Icon: GearIcon },
@@ -262,6 +270,7 @@ export default function App() {
               notify={notify}
             />
           )}
+          {route === 'history' && <HistoryScreen calls={calls} profiles={profiles} onNavigate={navigate} />}
           {route === 'lab' && (
             <LabScreen profiles={profiles} settings={settings} notify={notify} onNavigate={navigate} />
           )}
