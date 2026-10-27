@@ -120,10 +120,10 @@ export default function SettingsScreen({
 
       <Card title="Call history" subtitle="Control saving of checks.">
         <Toggle
-          checked={settings.autoSaveUnsaved ?? false}
-          onChange={(value) => onChange({ autoSaveUnsaved: value })}
-          label="Auto-save calls from unsaved numbers"
-          hint="When enabled, checks from calls marked as from an unsaved number are automatically recorded."
+          checked={settings.autoSaveAll ?? settings.autoSaveUnsaved ?? false}
+          onChange={(value) => onChange({ autoSaveAll: value, autoSaveUnsaved: value })}
+          label="Auto-save all calls"
+          hint="When enabled, every live call check is automatically recorded. When disabled, nothing is saved."
         />
       </Card>
 

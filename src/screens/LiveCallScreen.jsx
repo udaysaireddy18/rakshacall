@@ -178,10 +178,8 @@ export default function LiveCallScreen({ profiles, settings, onSaveCall, notify,
     setElapsed(0);
 
     if (snapshot) {
-      const shouldSave = newNumberRef.current
-        ? (settings.autoSaveUnsaved ?? false)
-        : true;
-      if (shouldSave) {
+      const autoSaveAll = settings.autoSaveAll ?? settings.autoSaveUnsaved ?? false;
+      if (autoSaveAll) {
         onSaveCall({
           at: snapshot.at,
           claimedId: claimedIdRef.current,
@@ -199,7 +197,7 @@ export default function LiveCallScreen({ profiles, settings, onSaveCall, notify,
         });
         notify?.('Check saved to your device.');
       } else {
-        notify?.('Check not saved (unsaved number).');
+        notify?.('Check not saved (auto-save disabled).');
       }
     }
     liveRef.current = null;
