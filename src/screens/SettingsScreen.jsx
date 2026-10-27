@@ -118,6 +118,15 @@ export default function SettingsScreen({
         />
       </Card>
 
+      <Card title="Call history" subtitle="Control saving of checks.">
+        <Toggle
+          checked={settings.autoSaveUnsaved ?? false}
+          onChange={(value) => onChange({ autoSaveUnsaved: value })}
+          label="Auto-save calls from unsaved numbers"
+          hint="When enabled, checks from calls marked as from an unsaved number are automatically recorded."
+        />
+      </Card>
+
       <Card title="Your data" subtitle="Everything is stored in this browser only. There is no account and no server.">
         <div className="grid grid--3">
           <Stat label="Voice profiles" value={profiles.length} />

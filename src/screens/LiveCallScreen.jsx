@@ -178,21 +178,29 @@ export default function LiveCallScreen({ profiles, settings, onSaveCall, notify,
     setElapsed(0);
 
     if (snapshot) {
-      onSaveCall({
-        at: snapshot.at,
-        claimedId: claimedIdRef.current,
-        claimedName: claimedProfile?.name || 'Unknown caller',
-        verdict: snapshot.identity?.verdict || 'unknown',
-        similarity: snapshot.identity?.similarity ?? null,
-        risk: snapshot.score,
-        spoof: snapshot.artifactScore,
-        script: snapshot.scriptScore,
-        headline: snapshot.headline,
-        reasons: snapshot.reasons,
-        advice: snapshot.advice,
-        durationSec: Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000)),
-      });
-      notify?.('Check saved to your device.');
+      const shouldSave = newNumberRef.current
+        ? (settings.autoSaveUnsaved ?? false)
+        : true;
+      if (shouldSave) {
+        onSaveCall({
+          at: snapshot.at,
+          claimedId: claimedIdRef.current,
+          claimedName: claimedProfile?.name || 'Unknown caller',
+          verdict: snapshot.identity?.verdict || 'unknown',
+          similarity: snapshot.identity?.similarity ?? null,
+          risk: snapshot.score,
+          spoof: snapshot.artifactScore,
+          script: snapshot.scriptScore,
+          headline: snapshot.headline,
+          reasons: snapshot.reasons,
+          advice: snapshot.advice,
+          durationSec: Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000)),
+          fromUnsavedNumber: newNumberRef.current,
+        });
+        notify?.('Check saved to your device.');
+      } else {
+        notify?.('Check not saved (unsaved number).');
+      }
     }
     liveRef.current = null;
   };

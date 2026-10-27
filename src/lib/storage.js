@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS = {
   liveWindowSec: 3,
   liveIntervalMs: 2600,
   soundAlerts: true,
+  autoSaveUnsaved: false,
 };
 
 export const newId = (prefix = 'id') =>
