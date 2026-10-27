@@ -1,0 +1,115 @@
+name: Deploy RakshaCall to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run DSP checks
+        run: npm run test:dsp
+
+      - name: Build production site
+        run: npm run build
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+
+      - name: Restore preview signing key
+        id: preview-key
+        uses: actions/cache/restore@v4
+        with:
+          path: .ci/preview.keystore
+          key: rakshacall-preview-keystore-v1
+
+      - name: Create preview signing key if needed
+        if: steps.preview-key.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p .ci
+          keytool -genkeypair \
+            -keystore .ci/preview.keystore \
+            -storetype PKCS12 \
+            -storepass rakshacall-preview \
+            -keypass rakshacall-preview \
+            -alias rakshacall-preview \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=RakshaCall Preview, OU=Preview, O=RakshaCall, L=Hyderabad, ST=Telangana, C=IN"
+
+      - name: Cache preview signing key
+        if: steps.preview-key.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .ci/preview.keystore
+          key: rakshacall-preview-keystore-v1
+
+      - name: Sync Capacitor Android project
+        run: npx cap sync android
+
+      - name: Build preview APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Add APK to the site
+        run: |
+          mkdir -p dist/downloads
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/downloads/RakshaCall.apk
+          SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          APKSIGNER=$(find "$SDK_ROOT/build-tools" -name apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --verbose --print-certs dist/downloads/RakshaCall.apk
+          ls -lh dist/downloads/RakshaCall.apk
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
